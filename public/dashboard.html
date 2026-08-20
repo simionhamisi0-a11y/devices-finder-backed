@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Kipata Vifaa</title>
+    <!-- Tunatumia Leaflet.js ambayo ni ramani ya bure kabisa (Open Source) badala ya Google Maps inayolipiwa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; }
+        #sidebar { width: 300px; background: #2c3e50; color: white; padding: 20px; height: 100vh; box-sizing: border-box; }
+        #map { flex-grow: 1; height: 100vh; }
+        input, button { width: 100%; padding: 10px; margin-top: 10px; border-radius: 5px; border: none; }
+        button { background: #e74c3c; color: white; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <h2>Utafutaji Vifaa</h2>
+        <p>Weka ID ya Kifaa kilichopotea:</p>
+        <input type="text" id="kifaa-id" value="kifaa_001">
+        <button onclick="tafutaKifaa()">TAFUTA SASA</button>
+        <hr>
+        <div id="info">
+            <p><strong>Jina:</strong> <span id="out-jina">-</span></p>
+            <p><strong>Muda:</strong> <span id="out-muda">-</span></p>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Anzisha ramani ya dunia na weka mtazamo wa kwanza katikati ya Tanzania (Dodoma/Mwanza)
+        var map = L.map('map').setView([-6.163, 35.751], 6);
+
+        // Weka muonekano wa ramani kutoka OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        var marker;
+
+        function tafutaKifaa() {
+            const id = document.getElementById("kifaa-id").value;
+
+            // Omba data kutoka kwenye seva yako ya Node.js
+            fetch(`http://localhost:3000/api/get-location/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.latitude && data.longitude) {
+                    document.getElementById("out-jina").innerText = data.jina_la_kifaa;
+                    document.getElementById("out-muda").innerText = new Date(data.muda_wa_sasa).toLocaleString();
+
+                    // Kama doti (marker) ipo, ifute kwanza kabla ya kuweka mpya
+                    if(marker) map.removeLayer(marker);
+
+                    // Weka doti jipya kwenye ramani ambapo kifaa kipo
+                    marker = L.marker([data.latitude, data.longitude]).addTo(map)
+                        .bindPopup(`<b>${data.jina_la_kifaa}</b><br>Kipo Hapa.`)
+                        .openPopup();
+
+                    // Sogeza ramani iende moja kwa moja hadi kwenye eneo la kifaa
+                    map.setView([data.latitude, data.longitude], 15);
+                } else {
+                    alert("Kifaa hakijapatikana au hakina taarifa za eneo.");
+                }
+            })
+            .catch(err => alert("Imeshindwa kuwasiliana na seva."));
+        }
+    </script>
+</body>
+</html>
