@@ -46,7 +46,7 @@
             const id = document.getElementById("kifaa-id").value;
 
             // Omba data kutoka kwenye seva yako ya Node.js
-            fetch(`http://localhost:3000/api/get-location/${id}`)
+            fetch(`https://devices-finder-backed.onrender.com/api/get-location/${id}`)
             .then(res => res.json())
             .then(data => {
                 if(data.latitude && data.longitude) {
