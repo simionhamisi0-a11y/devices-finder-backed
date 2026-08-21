@@ -12,7 +12,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-
 // Anzisha au fungua Hifadhidata (Database) ya SQLite
 const db = new sqlite3.Database('./vifaa.db', (err) => {
     if (err) {
@@ -52,7 +51,7 @@ app.post('/api/update-location', (req, res) => {
     });
 });
 
-// 2. ENDPOINT YA KUTOA DATA (Kwa ajili ya Dashboard yako ya Ramani)
+// 2. ENDPOINT YA KUTOA DATA YA KIFAA KIMOJA (Kwa ajili ya Ramani)
 app.get('/api/get-location/:id', (req, res) => {
     const kifaaId = req.params.id;
     const sql = `SELECT * FROM maeneo WHERE id = ?`;
@@ -68,17 +67,17 @@ app.get('/api/get-location/:id', (req, res) => {
     });
 });
 
-// Washa Seva
-app.listen(PORT, () => {
-    console.log(`Seva inakimbia kwenye http://localhost:${PORT}`);
-});
-
+// 3. ENDPOINT YA KUTOA ORODHA YA VIFAA VYOTE (Kwa ajili ya Dropdown ya Dashboard)
 app.get('/api/get-all-devices', (req, res) => {
-    db.all("SELECT id, jina_la_kifaa, muda_wa_sasa FROM vifaa", [], (err, rows) => {
+    db.all("SELECT id, jina_la_kifaa, muda_wa_sasa FROM maeneo", [], (err, rows) => {
         if (err) {
-            res.status(500).json({ error: err.message });
-            return;
+            return res.status(500).json({ error: err.message });
         }
         res.json({ vifaa: rows });
     });
+});
+
+// Washa Seva
+app.listen(PORT, () => {
+    console.log(`Seva inakimbia kwenye port ${PORT}`);
 });
