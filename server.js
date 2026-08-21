@@ -72,3 +72,13 @@ app.get('/api/get-location/:id', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Seva inakimbia kwenye http://localhost:${PORT}`);
 });
+
+app.get('/api/get-all-devices', (req, res) => {
+    db.all("SELECT id, jina_la_kifaa, muda_wa_sasa FROM vifaa", [], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json({ vifaa: rows });
+    });
+});

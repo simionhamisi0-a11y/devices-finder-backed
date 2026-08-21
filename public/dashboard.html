@@ -19,7 +19,12 @@
     <div id="sidebar">
         <h2>Utafutaji Vifaa</h2>
         <p>Weka ID ya Kifaa kilichopotea:</p>
-        <input type="text" id="kifaa-id" value="kifaa_001">
+        <!-- FUTA HII: <input type="text" id="deviceId" value="kifaa_001"> -->
+
+<!-- WEKA HII: -->
+<select id="deviceId">
+    <option value="">-- Chagua Kifaa --</option>
+</select>
         <button onclick="tafutaKifaa()">TAFUTA SASA</button>
         <hr>
         <div id="info">
@@ -69,6 +74,28 @@
             })
             .catch(err => alert("Imeshindwa kuwasiliana na seva."));
         }
+        // Function ya kuvuta orodha ya vifaa vyote pindi Dashboard inapofunguka
+async function pakiaVifaaVyote() {
+    try {
+        const response = await fetch('https://devices-finder-backed.onrender.com/api/get-all-devices');
+        const data = await response.json();
+        
+        const selectBox = document.getElementById('deviceId');
+        selectBox.innerHTML = '<option value="">-- Chagua Kifaa --</option>';
+        
+        data.vifaa.forEach(kifaa => {
+            const option = document.createElement('option');
+            option.value = kifaa.id;
+            option.textContent = `${kifaa.jina_la_kifaa} (${kifaa.id})`;
+            selectBox.appendChild(option);
+        });
+    } catch (err) {
+        console.error("Imeshindwa kupakia vifaa:", err);
+    }
+}
+
+// Ita function hii ukurasa unapofunguka
+pakiaVifaaVyote();
     </script>
 </body>
 </html>
