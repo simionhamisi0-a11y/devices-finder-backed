@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ulinzi wa Kifaa</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: inline-block; min-width: 280px; }
+        button { background: #28a745; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Mfumo wa Ulinzi wa Kifaa</h2>
+        <p>Hali ya Ulinzi: <strong style="color: green;">Imewashwa (Active)</strong></p>
+        <p>ID ya Kifaa Hiki: <strong style="color: #007bff;"><span id="device-id">Inapakia...</span></strong></p>
+        <hr>
+        <p id="status">Inasubiri amri ya kutuma eneo...</p>
+        <button onclick="tumaEneo()">Tuma Eneo Upya</button>
+    </div>
+
+    <script>
+        // 1. Tengeneza au chukua ID ya kipekee ya mtumiaji
+        let kifaa_id = localStorage.getItem('MY_DEVICE_ID');
+
+        if (!kifaa_id) {
+            kifaa_id = 'KIF' + Math.floor(100000 + Math.random() * 900000); // Mfano: KIF849201
+            localStorage.setItem('MY_DEVICE_ID', kifaa_id);
+        }
+
+        // Onyesha ID kwenye kioo cha mtumiaji
+        document.getElementById("device-id").innerText = kifaa_id;
+
+        // 2. Anwani ya Seva yako ya Render
+        const SEVA_URL = "https://devices-finder-backed.onrender.com/api/update-location";
+
+        // 3. Function ya kuchukua na kutuma Location
+        function tumaEneo() {
+            document.getElementById("status").innerText = "Inatafuta eneo (GPS)...";
+
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        document.getElementById("status").innerText = "Inatuma data kwenye seva...";
+
+                        // Tuma data kwenda Render
+                        fetch(SEVA_URL, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                id: kifaa_id,
+                                jina_la_kifaa: navigator.platform || "Kifaa cha Mtandao",
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            document.getElementById("status").innerText = "Eneo limetumwa kwenye seva kikamilifu!";
+                        })
+                        .catch(err => {
+                            console.error("Fetch Error:", err);
+                            document.getElementById("status").innerText = "Kosa la kutuma kwenye seva.";
+                        });
+                    },
+                    (error) => {
+                        console.error("Geolocation error:", error);
+                        document.getElementById("status").innerText = "Kosa la GPS: " + error.message;
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            } else {
+                document.getElementById("status").innerText = "Kivinjari hiki hakisaidii Geolocation.";
+            }
+        }
+
+        // Ita function kiotomatiki ukurasa unapofunguka
+        tumaEneo();
+    </script>
+</body>
+</html>
