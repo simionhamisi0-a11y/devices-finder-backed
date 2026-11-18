@@ -66,6 +66,9 @@ app.get('/api/get-location/:id', (req, res) => {
         res.json(row);
     });
 });
+app.get('/', (req, res) => {
+    res.send('Ulinzi Backend Server is running successfully! 🚀');
+});
 
 // 3. ENDPOINT YA KUTOA ORODHA YA VIFAA VYOTE (Kwa ajili ya Dropdown ya Dashboard)
 app.get('/api/get-all-devices', (req, res) => {
