@@ -1,5 +1,5 @@
 {
-  "name": "devices-finder-backend",
+  "name": "devices-finder-backed",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
